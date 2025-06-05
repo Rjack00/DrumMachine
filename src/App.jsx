@@ -1,35 +1,76 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react";
+
+
+
+const audioClips = {
+  q: 'https://cdn.freecodecamp.org/testable-projects-fcc/audio/Heater-1.mp3',
+  w: 'https://cdn.freecodecamp.org/testable-projects-fcc/audio/Heater-2.mp3',
+  e: "https://cdn.freecodecamp.org/testable-projects-fcc/audio/Heater-3.mp3",
+  a: "https://cdn.freecodecamp.org/testable-projects-fcc/audio/Heater-4_1.mp3",
+  s: "https://cdn.freecodecamp.org/testable-projects-fcc/audio/Heater-6.mp3",
+  d: "https://cdn.freecodecamp.org/testable-projects-fcc/audio/Dsc_Oh.mp3",
+  z: "https://cdn.freecodecamp.org/testable-projects-fcc/audio/Kick_n_Hat.mp3",
+  x: "https://cdn.freecodecamp.org/testable-projects-fcc/audio/RP4_KICK_1.mp3",
+  c: "https://cdn.freecodecamp.org/testable-projects-fcc/audio/Cev_H2.mp3"
+}
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [displayText, setDisplayText] = useState("");
+  const audioRefs = useRef({});
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    
+    this.handleKeyDown = this.handleKeyDown.bind(this);
+    this.playSound = this.playSound.bind(this);
+  }
+  
+  handleKeyDown (e) {
+    const key = e.key.toUpperCase();
+    if(this.audioRefs[key]){
+      const audio = this.audioRefs[key].current;
+      if(audio) {
+        audio.currentTime = 0;
+        audio.play();
+        this.setState({displayText: key});
+      }
+    }
+  }
+  
+  componentDidMount () {
+    document.addEventListener('keydown', this.handleKeyDown);
+  }
+  
+  componentWillUnmount () {
+    document.removeEventListener('keydown', this.handleKeyDown);
+  }
+
+  playSound (e) {
+    const key = e.target.innerText;
+    const audio = this.audioRefs[key].current;
+    if (audio) {
+      audio.currentTime = 0;
+      audio.play();
+      this.setState({displayText: key});
+    }
+  }
+    
+  render(){
+    return(
+      <div id='drum-machine'>
+        <div id='display'>{this.state.displayText}
+          {["Q","W","E","A","S","D","Z","X","C"].map(key => (
+          <button id={audioClips[key.toLowerCase()]} className='drum-pad' key={key} onClick={this.playSound}>
+              {key}
+              <audio 
+                id={key} 
+                className='clip' 
+                ref={this.audioRefs[key]} 
+                src={audioClips[key.toLowerCase()]}>
+              </audio>
+            </button>))}
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    );
+  }
 }
 
 export default App

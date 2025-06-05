@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useEffect, useState } from "react";
 
 
 
@@ -19,58 +19,54 @@ function App() {
   const audioRefs = useRef({});
 
     
-    this.handleKeyDown = this.handleKeyDown.bind(this);
-    this.playSound = this.playSound.bind(this);
-  }
   
-  handleKeyDown (e) {
+  function handleKeyDown (e) {
     const key = e.key.toUpperCase();
-    if(this.audioRefs[key]){
-      const audio = this.audioRefs[key].current;
+    if(audioRefs[key]){
+      const audio = audioRefs[key].current;
       if(audio) {
         audio.currentTime = 0;
         audio.play();
-        this.setState({displayText: key});
+        setDisplayText(key);
       }
     }
   }
   
-  componentDidMount () {
-    document.addEventListener('keydown', this.handleKeyDown);
-  }
-  
-  componentWillUnmount () {
-    document.removeEventListener('keydown', this.handleKeyDown);
-  }
+  useEffect(() => {
+    document.addEventListener('keydown', handleKeyDown);
 
-  playSound (e) {
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    }
+  }, []);
+  
+
+  function playSound (e) {
     const key = e.target.innerText;
-    const audio = this.audioRefs[key].current;
+    const audio = audioRefs[key].current;
     if (audio) {
       audio.currentTime = 0;
       audio.play();
-      this.setState({displayText: key});
+      setDisplayText(key);
     }
   }
     
-  render(){
     return(
       <div id='drum-machine'>
-        <div id='display'>{this.state.displayText}
+        <div id='display'>{displayText}
           {["Q","W","E","A","S","D","Z","X","C"].map(key => (
-          <button id={audioClips[key.toLowerCase()]} className='drum-pad' key={key} onClick={this.playSound}>
+          <button id={audioClips[key.toLowerCase()]} className='drum-pad' key={key} onClick={playSound}>
               {key}
               <audio 
                 id={key} 
                 className='clip' 
-                ref={this.audioRefs[key]} 
+                ref={audioRefs[key]} 
                 src={audioClips[key.toLowerCase()]}>
               </audio>
             </button>))}
         </div>
       </div>
     );
-  }
 }
 
 export default App

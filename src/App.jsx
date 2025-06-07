@@ -1,4 +1,4 @@
-import { useRef, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 
 
 
@@ -18,21 +18,20 @@ function App() {
   const [displayText, setDisplayText] = useState("");
   const audioRefs = useRef({});
 
-    
-  
-  function handleKeyDown (e) {
-    const key = e.key.toUpperCase();
-    if(audioRefs[key]){
-      const audio = audioRefs[key].current;
-      if(audio) {
-        audio.currentTime = 0;
-        audio.play();
-        setDisplayText(key);
-      }
-    }
-  }
+  Object.keys(audioClips).forEach(key => {
+    if(!audioRefs.current[key.toUpperCase()]) {
+  audioRefs.current[key.toUpperCase()] = React.createRef();
+    };
+  });
   
   useEffect(() => {
+    const handleKeyDown = (e) => {
+    const key = e.key.toUpperCase();
+    if(audioRefs.current[key]){
+      playSound(key);
+    }
+  }
+
     document.addEventListener('keydown', handleKeyDown);
 
     return () => {
@@ -41,26 +40,27 @@ function App() {
   }, []);
   
 
-  function playSound (e) {
-    const key = e.target.innerText;
-    const audio = audioRefs[key].current;
+  function playSound (key) {
+    const audio = audioRefs.current[key]?.current;
     if (audio) {
       audio.currentTime = 0;
       audio.play();
       setDisplayText(key);
     }
   }
+
+  
     
     return(
       <div id='drum-machine'>
         <div id='display'>{displayText}
           {["Q","W","E","A","S","D","Z","X","C"].map(key => (
-          <button id={audioClips[key.toLowerCase()]} className='drum-pad' key={key} onClick={playSound}>
+          <button id={audioClips[key.toLowerCase()]} className='drum-pad' key={key} onClick={() => playSound(key)}>
               {key}
               <audio 
                 id={key} 
                 className='clip' 
-                ref={audioRefs[key]} 
+                ref={audioRefs.current[key]} 
                 src={audioClips[key.toLowerCase()]}>
               </audio>
             </button>))}
@@ -69,4 +69,4 @@ function App() {
     );
 }
 
-export default App
+export default App;
